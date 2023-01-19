@@ -1,0 +1,59 @@
+name: "NAIS Docker Push"
+description: "Build and push docker image to the NAIS registry"
+inputs:
+  config:
+    description: "Configuration. See readme for details"
+    required: true
+  push_image:
+    description: "Push image to registry"
+    required: true
+    default: "true"
+  dockerfile:
+    description: "Dockerfile"
+    required: true
+    default: "Dockerfile"
+  docker_context:
+    description: "Docker context"
+    required: true
+    default: "."
+  tag:
+    description: "Custom docker tag"
+    required: false
+outputs:
+  tag:
+    description: "Release tag"
+    value: ${{ steps.setup.outputs.NEW_VERSION }}
+  image:
+    description: "Image name"
+    value: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}:${{ steps.setup.outputs.NEW_VERSION }}
+runs:
+  using: "composite"
+  steps:
+    - name: NAIS login
+      uses: nais/login@v0
+      id: login
+      with:
+        config: ${{ inputs.config }}
+    - name: Setup environment
+      shell: bash
+      id: "setup"
+      run: |
+        if [ -z "${{ inputs.tag }}" ]; then
+          echo "NEW_VERSION=$(date '+%Y.%-m.%-d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        else
+          echo "NEW_VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+        fi
+        echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}" >> $GITHUB_OUTPUT
+    - name: Build and push
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v3
+      with:
+        context: ${{ inputs.docker_context }}
+        file: ${{ inputs.dockerfile }}
+        push: ${{ inputs.push_image }}
+        tags: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}:${{ steps.setup.outputs.NEW_VERSION }}
+        labels: |
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.version=${{ steps.setup.outputs.NEW_VERSION }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
