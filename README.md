@@ -1,7 +1,7 @@
 # Usage
 
 ```yaml
-- uses: nais/docker-push@v0
+- uses: nais/docker-build-push@v0
   id: docker-push
   with:
     config: ${{ vars.DOCKER_PUSH_CONFIG }} # required
