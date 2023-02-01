@@ -45,7 +45,6 @@ runs:
         fi
         echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}" >> $GITHUB_OUTPUT
     - name: Build and push
-      if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@v3
       with:
         context: ${{ inputs.docker_context }}
