@@ -4,7 +4,9 @@
 - uses: nais/docker-build-push@v0
   id: docker-push
   with:
-    config: ${{ vars.DOCKER_PUSH_CONFIG }} # required
+    project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required
+    identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required
+    team: aura
     tag: custom_tag # optional
     push_image: true # optional, default true
     dockerfile: Dockerfile # optional, default Dockerfile
