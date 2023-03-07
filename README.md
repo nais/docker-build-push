@@ -1,16 +1,25 @@
 # Usage
 
 ```yaml
-- uses: nais/docker-build-push@v0
-  id: docker-push
-  with:
-    project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required
-    identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required
-    team: myteam # required
-    tag: custom_tag # optional
-    push_image: true # optional, default true
-    dockerfile: Dockerfile # optional, default Dockerfile
-    docker_context: . # optional, default .
+jobs:
+  build_and_push:
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3  
+      - uses: nais/docker-build-push@v0
+        id: docker-push
+        with:
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required
+          team: myteam # required
+          tag: custom_tag # optional
+          push_image: true # optional, default true
+          dockerfile: Dockerfile # optional, default Dockerfile
+          docker_context: . # optional, default .
 
 # ...
 - name: Deploy
