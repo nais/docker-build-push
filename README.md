@@ -18,8 +18,8 @@ jobs:
           push_image: true # optional, default true
           dockerfile: Dockerfile # optional, default Dockerfile
           docker_context: . # optional, default .
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined org wide
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined org wide
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
       - name: Deploy
         uses: nais/deploy/actions/deploy@v1
         env:
