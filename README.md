@@ -6,7 +6,7 @@
   with:
     project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required
     identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required
-    team: aura
+    team: myteam # required
     tag: custom_tag # optional
     push_image: true # optional, default true
     dockerfile: Dockerfile # optional, default Dockerfile
