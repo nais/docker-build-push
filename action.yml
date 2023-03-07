@@ -1,4 +1,4 @@
-name: "NAIS Docker Push"
+name: "NAIS Docker Build Push"
 description: "Build and push docker image to the NAIS registry"
 inputs:
   push_image:
