@@ -16,6 +16,12 @@ inputs:
   tag:
     description: "Custom docker tag"
     required: false
+  project_id:
+    description: "Google Cloud project ID"
+    required: true
+  identity_provider:
+    description: "Workload Identity Provider"
+    required: true
   team:
     description: "Team slug"
     required: true
@@ -33,6 +39,8 @@ runs:
       uses: nais/login@v0
       id: login
       with:
+        project_id: ${{ inputs.project_id }}
+        identity_provider: ${{ inputs.identity_provider }}
         team: ${{ inputs.team }}
     - name: Setup environment
       shell: bash
