@@ -20,13 +20,11 @@ jobs:
           push_image: true # optional, default true
           dockerfile: Dockerfile # optional, default Dockerfile
           docker_context: . # optional, default .
-
-# ...
-- name: Deploy
-  uses: nais/deploy/actions/deploy@v1
-  env:
-    # ...
-    IMAGE: ${{ steps.docker-push.outputs.image }}
+      - name: Deploy
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          # ...
+          IMAGE: ${{ steps.docker-push.outputs.image }}
 ```
 
 ## Dependency
