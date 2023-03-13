@@ -16,10 +16,6 @@ inputs:
   tag:
     description: "Custom docker tag"
     required: false
-  tag_latest:
-    description: "Create latest docker tag"
-    required: false
-    default: "false"
   project_id:
     description: "Google Cloud project ID"
     required: true
@@ -58,9 +54,8 @@ runs:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
         tags: |
-          type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9002
-          type=sha,prefix={{date 'YYYY-MM-DD'}}-,priority=9001
-          type=raw,enable=${{ inputs.tag_latest == 'true' }},value=latest,priority=9000
+          type=sha,prefix={{date 'YYYY-MM-DD'}}-,priority=9002
+          type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
