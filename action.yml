@@ -28,10 +28,10 @@ inputs:
 outputs:
   tag:
     description: "Release tag"
-    value: ${{ steps.setup.outputs.NEW_VERSION }}
+    value: ${{ steps.set-outputs.outputs.NEW_VERSION }}
   image:
     description: "Image name"
-    value: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}:${{ steps.setup.outputs.NEW_VERSION }}
+    value: ${{ steps.set-outputs.outputs.IMAGE }}
 runs:
   using: "composite"
   steps:
@@ -46,21 +46,31 @@ runs:
       shell: bash
       id: "setup"
       run: |
-        if [ -z "${{ inputs.tag }}" ]; then
-          echo "NEW_VERSION=$(date '+%Y.%-m.%-d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-        else
-          echo "NEW_VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
-        fi
         echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}" >> $GITHUB_OUTPUT
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
+        tags: |
+          type=sha,prefix={{date 'YYYY-MM-DD'}}-,priority=9002
+          type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: ${{ inputs.docker_context }}
         file: ${{ inputs.dockerfile }}
         push: ${{ inputs.push_image }}
-        tags: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}:${{ steps.setup.outputs.NEW_VERSION }}
-        labels: |
-          org.opencontainers.image.revision=${{ github.sha }}
-          org.opencontainers.image.version=${{ steps.setup.outputs.NEW_VERSION }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+    # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again. 
+    - name: Set outputs
+      shell: bash
+      id: set-outputs
+      run: |
+        echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
+        echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
+
