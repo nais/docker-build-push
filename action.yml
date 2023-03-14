@@ -25,6 +25,14 @@ inputs:
   team:
     description: "Team slug"
     required: true
+  cache_from:
+    description: "Docker buildx cache from"
+    required: false
+    default: "type=gha"
+  cache_to: "Docker buildx cache to"
+    description: false
+    required: false
+    default: "type=gha,mode=max"
 outputs:
   tag:
     description: "Release tag"
@@ -64,8 +72,8 @@ runs:
         push: ${{ inputs.push_image }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: ${{ inputs.cache_from }}
+        cache-to: ${{ inputs.cache_to }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again. 
     - name: Set outputs
       shell: bash
