@@ -29,8 +29,8 @@ inputs:
     description: "Docker buildx cache from"
     required: false
     default: "type=gha"
-  cache_to: "Docker buildx cache to"
-    description: false
+  cache_to:
+    description: "Docker buildx cache to"
     required: false
     default: "type=gha,mode=max"
 outputs:
@@ -74,11 +74,10 @@ runs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: ${{ inputs.cache_from }}
         cache-to: ${{ inputs.cache_to }}
-    # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again. 
+    # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
       id: set-outputs
       run: |
         echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
-
