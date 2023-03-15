@@ -55,6 +55,13 @@ runs:
       id: "setup"
       run: |
         echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}" >> $GITHUB_OUTPUT
+        if [ ! -f "${{ inputs.dockerfile }}" ]; then
+          echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
+          exit 1
+        elif [ ! -d "${{ inputs.docker_context }}" ]; then
+          echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
+          exit 1
+        fi
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -66,6 +73,7 @@ runs:
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
       uses: docker/build-push-action@v4
+      id: build_push
       with:
         context: ${{ inputs.docker_context }}
         file: ${{ inputs.dockerfile }}
@@ -75,6 +83,12 @@ runs:
         cache-from: ${{ inputs.cache_from }}
         cache-to: ${{ inputs.cache_to }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
+    - name: Check for errors
+      if: ${{ failure() && steps.build_push.outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "::error ::Failed during image build. Is your docker_context set to where your build files are?"
+        exit 1
     - name: Set outputs
       shell: bash
       id: set-outputs
