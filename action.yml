@@ -33,6 +33,8 @@ inputs:
     description: "Docker buildx cache to"
     required: false
     default: "type=gha,mode=max"
+  image_suffix:
+    description: "Adds a suffiks to the generated docker image name"
 outputs:
   tag:
     description: "Release tag"
@@ -54,7 +56,6 @@ runs:
       shell: bash
       id: "setup"
       run: |
-        echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}" >> $GITHUB_OUTPUT
         if [ ! -f "${{ inputs.dockerfile }}" ]; then
           echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
           exit 1
@@ -62,6 +63,10 @@ runs:
           echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
           exit 1
         fi
+
+        suffix="${{ inputs.image_suffix }}"
+        echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )" >> $GITHUB_OUTPUT
+
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
