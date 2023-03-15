@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3  
+        uses: actions/checkout@v3
       - uses: nais/docker-build-push@v0
         id: docker-push
         with:
@@ -18,6 +18,9 @@ jobs:
           push_image: true # optional, default true
           dockerfile: Dockerfile # optional, default Dockerfile
           docker_context: . # optional, default .
+          image_suffix: # optional, default empty
+          cache_from: type=gha # optional, default type=gha
+          cache_to: type=gha,mode=max # optional, default type=gha,mode=max
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
       - name: Deploy
