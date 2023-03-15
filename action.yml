@@ -74,7 +74,7 @@ runs:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
         tags: |
-          type=sha,prefix={{date 'YYYY-MM-DD'}}-,priority=9002
+          type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
       uses: docker/build-push-action@v4
