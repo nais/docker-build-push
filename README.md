@@ -33,3 +33,13 @@ jobs:
 ## Dependency
 
 This action depends on [nais/login](https://github.com/nais/login) to authenticate with the registry.
+
+## Known issues
+
+### Overwriting environment variables
+
+When using this action in a job that also uses [navikt/frontend/actions/cdn-upload](https://github.com/navikt/frontend/tree/main/actions/cdn-upload/v1), you will get warnings that the latter of the two is overwriting multiple environment variables.
+
+The two actions will both authenticate to Google Cloud, but with different service accounts and possibly project IDs.
+
+The known solution is to split the job into two separate jobs.
