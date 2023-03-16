@@ -22,6 +22,9 @@ jobs:
           image_suffix: # optional, default empty
           cache_from: type=gha # optional, default type=gha
           cache_to: type=gha,mode=max # optional, default type=gha,mode=max
+          build_args: | # optional, default empty
+            FOO=bar
+            BAZ=qux
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
       - name: Deploy
