@@ -35,6 +35,11 @@ inputs:
     default: "type=gha,mode=max"
   image_suffix:
     description: "Adds a suffiks to the generated docker image name"
+    required: false
+  pull:
+    description: "Pull image before building"
+    required: false
+    default: "true"
 outputs:
   tag:
     description: "Release tag"
@@ -83,6 +88,7 @@ runs:
         context: ${{ inputs.docker_context }}
         file: ${{ inputs.dockerfile }}
         push: ${{ inputs.push_image }}
+        pull: ${{ inputs.pull }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: ${{ inputs.cache_from }}
