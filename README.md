@@ -1,4 +1,12 @@
-# Usage
+# nais/docker-build-push
+
+This action contains recomended steps for building and publishing a Docker image for use at with the NAIS platform.
+
+It will authenticate with the registry and build the image, named after the repository, and use a generated tag containing the timestamp and short commit hash.
+
+If you need to build multiple images from the same repository, you can use the `image_suffix` input to add a suffix to the image name.
+
+## Usage
 
 ```yaml
 jobs:
