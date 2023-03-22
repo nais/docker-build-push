@@ -98,7 +98,7 @@ runs:
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
     - name: Generate SBOM, attest and sign image
-      uses: nais/attest-sign:v1.0.0
+      uses: nais/attest-sign@v1.0.0
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
