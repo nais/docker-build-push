@@ -33,6 +33,9 @@ jobs:
           build_args: | # optional, default empty
             FOO=bar
             BAZ=qux
+          build_secrets:
+            | # optional, default empty. See https://docs.docker.com/build/ci/github-actions/secrets/
+            key=string
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
       - name: Deploy
