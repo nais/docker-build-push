@@ -54,6 +54,10 @@ inputs:
     description: "Path to the directory containing the source code"
     required: false
     default: "."
+  salsa_dependencies:
+    description: "Enable salsa to scan dependencies"
+    required: false
+    default: "true"
 outputs:
   tag:
     description: "Release tag"
@@ -116,6 +120,7 @@ runs:
         byo-sbom: ${{ inputs.sbom }}
         build-context: ${{ inputs.salsa_context }}
         go-main-dir: ./cmd/${{ inputs.steps.setup.outputs.REPO_NAME }}
+        with-dependencies: ${{ inputs.salsa_dependencies }}
         google-service-account: ${{ steps.login.outputs.sa_email }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Check for errors
