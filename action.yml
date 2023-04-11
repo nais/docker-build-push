@@ -118,3 +118,4 @@ runs:
       run: |
         echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
+        echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
