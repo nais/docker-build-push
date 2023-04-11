@@ -46,6 +46,14 @@ inputs:
   build_secrets:
     description: "List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)"
     required: false
+  sbom:
+    description: "Generate your own sbom json and attach it to the action"
+    required: false
+    default: ""
+  salsa_context:
+    description: "Path to the directory containing the source code"
+    required: false
+    default: "."
 outputs:
   tag:
     description: "Release tag"
@@ -102,9 +110,13 @@ runs:
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
     - name: Generate SBOM, attest and sign image
-      uses: nais/attest-sign@v1.0.0
+      uses: nais/salsa-action@main
       with:
-        image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
+        image: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
+        byo-sbom: ${{ inputs.sbom }}
+        build-context: ${{ inputs.salsa_context }}
+        go-main-dir: ./cmd/${{ inputs.steps.setup.outputs.REPO_NAME }}
+        google-service-account: ${{ steps.login.outputs.sa_email }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
