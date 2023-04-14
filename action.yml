@@ -58,6 +58,10 @@ inputs:
     description: "Enable salsa to scan dependencies"
     required: false
     default: "true"
+  salsa_go_main_dir:
+    description: "Path to the main go directory, when the project have multiple main.go files"
+    required: false
+    default: ""
 outputs:
   tag:
     description: "Release tag"
@@ -114,12 +118,12 @@ runs:
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
     - name: Generate SBOM, attest and sign image
-      uses: nais/salsa-action@main
+      uses: nais/salsa-action@v0.1
       with:
         image: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         byo-sbom: ${{ inputs.sbom }}
         build-context: ${{ inputs.salsa_context }}
-        go-main-dir: ./cmd/${{ inputs.steps.setup.outputs.REPO_NAME }}
+        go-main-dir: ${{ inputs.salsa_go_main_dir }}
         with-dependencies: ${{ inputs.salsa_dependencies }}
         google-service-account: ${{ steps.login.outputs.sa_email }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
