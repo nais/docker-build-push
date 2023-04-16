@@ -118,7 +118,7 @@ runs:
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
     - name: Generate SBOM, attest and sign image
-      uses: nais/salsa-action@v0.1
+      uses: nais/salsa-action@v0.2
       with:
         image: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         byo-sbom: ${{ inputs.sbom }}
