@@ -96,7 +96,7 @@ runs:
         push: ${{ inputs.push_image }}
         pull: ${{ inputs.pull }}
         tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        labels: ${{ steps.meta.outputs.labels }},org.opencontainers.image.workflow.ref=${GITHUB_WORKFLOW_REF}
         cache-from: ${{ inputs.cache_from }}
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
