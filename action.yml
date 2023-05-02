@@ -101,17 +101,13 @@ runs:
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
-    - name: Generate SBOM, attest and sign image
-      uses: nais/attest-sign@v1.0.0
-      with:
-        image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
-    # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
       run: |
         echo "::error ::Failed during image build. Is your docker_context set to where your build files are?"
         exit 1
+    # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
       id: set-outputs
