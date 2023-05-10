@@ -46,6 +46,9 @@ inputs:
   build_secrets:
     description: "List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)"
     required: false
+  metadata_context:
+    description: "Metadata context; see https://github.com/docker/metadata-action#context-input"
+    default: "workflow"
 outputs:
   tag:
     description: "Release tag"
@@ -82,6 +85,7 @@ runs:
       id: meta
       uses: docker/metadata-action@v4
       with:
+        context: ${{ inputs.metadata_context }}
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
         tags: |

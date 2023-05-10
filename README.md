@@ -36,6 +36,7 @@ jobs:
           build_secrets:
             | # optional, default empty. See https://docs.docker.com/build/ci/github-actions/secrets/
             key=string
+          metadata_context: workflow # optional, default workflow (must be one of "git" or "workflow"). See https://github.com/docker/metadata-action#context-input
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
       - name: Deploy
