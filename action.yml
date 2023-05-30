@@ -61,7 +61,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      uses: nais/login@v0
+      uses: nais/login@104bca34b70d1d00fe837bcd0689633978eca744 # ratchet:nais/login@v0
       id: login
       with:
         project_id: ${{ inputs.project_id }}
@@ -81,10 +81,9 @@ runs:
 
         suffix="${{ inputs.image_suffix }}"
         echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )" >> $GITHUB_OUTPUT
-
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@c4ee3adeed93b1fa6a762f209fb01608c1a22f1e # ratchet:docker/metadata-action@v4
       with:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
@@ -92,7 +91,7 @@ runs:
           type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 # ratchet:docker/build-push-action@v4
       id: build_push
       with:
         context: ${{ inputs.docker_context }}
@@ -113,7 +112,7 @@ runs:
         exit 1
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.attest == 'true' }}
-      uses: nais/attest-sign@v1.0.0
+      uses: nais/attest-sign@b21f2f03bcfa1e51f39b52690732017787c4d03f # ratchet:nais/attest-sign@v1.0.0
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
