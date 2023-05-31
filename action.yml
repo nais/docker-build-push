@@ -61,7 +61,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      uses: nais/login@104bca34b70d1d00fe837bcd0689633978eca744 # ratchet:nais/login@v0
+      uses: nais/login@v0
       id: login
       with:
         project_id: ${{ inputs.project_id }}
@@ -111,8 +111,8 @@ runs:
         echo "::error ::Failed during image build. Is your docker_context set to where your build files are?"
         exit 1
     - name: Generate SBOM, attest and sign image
-      if: ${{ inputs.push_image == 'true' && inputs.attest == 'true' }}
-      uses: nais/attest-sign@14bc3392f7106e1737260e6fffc9e5d4eccf8c68 # ratchet:nais/attest-sign@v1.0.1
+      if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
+      uses: nais/attest-sign@v1.0.1
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
