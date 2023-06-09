@@ -50,7 +50,17 @@ inputs:
     description: "enable image attestation for SLSA"
     required: false
     default: "true"
+  byosbom:
+    description: "Bring your own, use existing SBOM for SLSA"
+    required: false
+    default: "auto-generate-for-me-please.json"
 outputs:
+  salsa:
+    description: "SLSA attestation"
+    value: ${{ steps.set-outputs.outputs.SALSA }}
+  digest:
+    description: "Image digest"
+    value: ${{ steps.set-outputs.outputs.DIGEST }}
   tag:
     description: "Release tag"
     value: ${{ steps.set-outputs.outputs.NEW_VERSION }}
@@ -112,9 +122,11 @@ runs:
         exit 1
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
-      uses: nais/attest-sign@v1.0.1
+      id: attest-sign
+      uses: nais/attest-sign@v1.1.0
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
+        sbom: ${{ inputs.byosbom }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
@@ -123,3 +135,4 @@ runs:
         echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
         echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
+        echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
