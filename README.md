@@ -38,6 +38,8 @@ jobs:
             key=string
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
+          salsa: true # optional, default true, generates a attestation for the image
+          byosbom: #defaults to use Trivy for SBOM generation if salsa is true, but can be overwritten sending in a path to a SBOM file
       - name: Deploy
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -58,3 +60,7 @@ When using this action in a job that also uses [navikt/frontend/actions/cdn-uplo
 The two actions will both authenticate to Google Cloud, but with different service accounts and possibly project IDs.
 
 The known solution is to split the job into two separate jobs.
+
+### Salsa
+
+For info about limitations and known issues with Salsa, see [Nais Salsa](https://docs.nais.io/security/salsa/salsa/#known-limitations)
