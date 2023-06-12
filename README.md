@@ -61,6 +61,15 @@ The two actions will both authenticate to Google Cloud, but with different servi
 
 The known solution is to split the job into two separate jobs.
 
+### Long repo names or long branch names
+
+`The size of mapped attribute exceeds the 127 bytes limit.`
+
+When using [Google Workload-identity-federation](https://cloud.google.com/iam/docs/workload-identity-federation) we map attributes from authentication credentials issued by an external identity provider to Google Cloud attributes, such as `google.subject`.
+`google.subject` is the principal IAM is authenticating and cannot exceed 127 bytes.
+The error typically happens if you have a long branch name, or a long repo name.
+Referring to this issue: https://github.com/google-github-actions/auth/blob/main/docs/TROUBLESHOOTING.md#subject-exceeds-the-127-byte-limit
+
 ### Salsa and language dependency resolution
 
 For info about limitations and known issues with Salsa, see [Nais Salsa](https://docs.nais.io/security/salsa/salsa/#known-limitations)
