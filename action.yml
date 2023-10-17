@@ -54,6 +54,9 @@ inputs:
     description: "Bring your own, use existing SBOM for SLSA"
     required: false
     default: "auto-generate-for-me-please.json"
+  platforms:
+    description: "List of target platforms for build"
+    required: false
 outputs:
   salsa:
     description: "SLSA attestation"
@@ -114,6 +117,7 @@ runs:
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
+        platforms: $(( inputs.platforms }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
