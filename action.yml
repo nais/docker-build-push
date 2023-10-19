@@ -112,11 +112,8 @@ runs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: ${{ inputs.cache_from }}
         cache-to: ${{ inputs.cache_to }}
-        build-args: ${{ inputs.build_args }}
+        build-args: ${{ inputs.build_args }}, _NEW_VERSION: ${{ steps.meta.outputs.version }}, _REPO_NAME: ${{ steps.setup.outputs.REPO_NAME }}
         secrets: ${{ inputs.build_secrets }}
-      env:
-        NEW_VERSION: ${{ steps.meta.outputs.version }}
-        REPO_NAME: ${{ steps.setup.outputs.REPO_NAME }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
