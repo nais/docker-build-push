@@ -117,7 +117,7 @@ runs:
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
-        platforms: $(( inputs.platforms }}
+        platforms: ${{ inputs.platforms }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
