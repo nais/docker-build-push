@@ -36,6 +36,7 @@ jobs:
           build_secrets:
             | # optional, default empty. See https://docs.docker.com/build/ci/github-actions/secrets/
             key=string
+          target: runtime # optional, default empty
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
           salsa: true # optional, default true, generates a attestation for the image

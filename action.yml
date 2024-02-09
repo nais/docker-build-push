@@ -46,6 +46,9 @@ inputs:
   build_secrets:
     description: "List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)"
     required: false
+  target:
+    description: "Sets the target stage to build"
+    required: false
   salsa:
     description: "enable image attestation for SLSA"
     required: false
@@ -114,6 +117,7 @@ runs:
         cache-to: ${{ inputs.cache_to }}
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
+        target: ${{ inputs.target }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
