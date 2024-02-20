@@ -46,6 +46,9 @@ inputs:
   build_secrets:
     description: "List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)"
     required: false
+  target:
+    description: "Sets the target stage to build"
+    required: false
   salsa:
     description: "enable image attestation for SLSA"
     required: false
@@ -96,7 +99,7 @@ runs:
         echo "REPO_NAME=${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # ratchet:docker/metadata-action@v5
+      uses: docker/metadata-action@dbef88086f6cef02e264edb7dbf63250c17cef6c # ratchet:docker/metadata-action@v5
       with:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
@@ -104,7 +107,7 @@ runs:
           type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
-      uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # ratchet:docker/build-push-action@v5
+      uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # ratchet:docker/build-push-action@v5
       id: build_push
       with:
         context: ${{ inputs.docker_context }}
@@ -118,6 +121,7 @@ runs:
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
         platforms: ${{ inputs.platforms }}
+        target: ${{ inputs.target }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
@@ -127,7 +131,7 @@ runs:
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
-      uses: nais/attest-sign@v1.1.0
+      uses: nais/attest-sign@v1.3.4
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
