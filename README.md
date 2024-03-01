@@ -41,6 +41,7 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
           salsa: true # optional, default true, generates a attestation for the image
           byosbom: # defaults to use Trivy for SBOM generation, if salsa is true, but can be overwritten sending in a path to a  pre-generated SBOM
+          platforms: # optional, pass trough to docker/build-push-action. See https://github.com/docker/build-push-action#usage. Requires setup-qemu-action, https://github.com/docker/setup-qemu-action#usage
       - name: Deploy
         uses: nais/deploy/actions/deploy@v1
         env:
