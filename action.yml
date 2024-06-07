@@ -60,6 +60,10 @@ inputs:
   platforms:
     description: "List of target platforms for build"
     required: false
+  skip_login:
+    description: "Skip automatic login to Google Cloud"
+    required: false
+    default: "false"
 outputs:
   salsa:
     description: "SLSA attestation"
@@ -77,6 +81,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
+      if: ${{ inputs.nais_login != 'false' }}
       uses: nais/login@v0
       id: login
       with:
