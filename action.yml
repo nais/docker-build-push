@@ -60,7 +60,7 @@ inputs:
   platforms:
     description: "List of target platforms for build"
     required: false
-  auto_login:
+  login:
     description: "Automatically login to Google Cloud"
     required: false
     default: "true"
@@ -81,7 +81,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      if: ${{ inputs.auto_login == 'true' }}
+      if: ${{ inputs.login == 'true' }}
       uses: nais/login@v0
       id: login
       with:
