@@ -95,9 +95,8 @@ runs:
           exit 1
         fi
 
-        if [[ -n "${{ inputs.image_suffix }}" ]]; then
-          suffix="-${{ inputs.image_suffix }}"
-        fi
+        suffix="${{ inputs.image_suffix }}"
+        suffix=${suffix:+-$suffix} # Ensure we only add a dash if suffix is set
         repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
