@@ -92,6 +92,7 @@ runs:
       shell: bash
       id: "setup"
       run: |
+        set -x
         if [ ! -f "${{ inputs.dockerfile }}" ]; then
           echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
           exit 1
@@ -100,10 +101,8 @@ runs:
           exit 1
         fi
 
-        if [[ -n "${{ inputs.image_suffix }}" ]]; then
-          suffix="-${{ inputs.image_suffix }}"
-        fi
-        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
+        suffix="${{ inputs.image_suffix }}"
+        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
