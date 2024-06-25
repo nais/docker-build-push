@@ -92,22 +92,19 @@ runs:
       shell: bash
       id: "setup"
       run: |
-        set -ex
         if [ ! -f "${{ inputs.dockerfile }}" ]; then
           echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
-          exit 2
+          exit 1
         elif [ ! -d "${{ inputs.docker_context }}" ]; then
           echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
-          exit 3
+          exit 1
         fi
 
-        suffix="${{ inputs.image_suffix }}"
-        sub="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}"
-        calc_suffix="$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
-        repo_name3="$sub$calc_suffix"
-        echo -n "$repo_name3"
-        echo -n "$repo_name3" | awk '{print tolower($0)}'
-        repo_name="$( echo -n "$repo_name3" | awk '{print tolower($0)}' )"
+        if [[ -n "${{ inputs.image_suffix }}" ]]; then
+          suffix="-${{ inputs.image_suffix }}"
+        fi
+        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
+        repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
