@@ -60,10 +60,6 @@ inputs:
   platforms:
     description: "List of target platforms for build"
     required: false
-  login:
-    description: "Automatically login to Google Cloud"
-    required: false
-    default: "true"
 outputs:
   salsa:
     description: "SLSA attestation"
@@ -81,7 +77,6 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      if: ${{ inputs.login == 'true' }}
       uses: nais/login@v0
       id: login
       with:
@@ -100,8 +95,10 @@ runs:
           exit 1
         fi
 
-        suffix="${{ inputs.image_suffix }}"
-        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )" 
+        if [[ -n "${{ inputs.image_suffix }}" ]]; then
+          suffix="-${{ inputs.image_suffix }}"
+        fi
+        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
