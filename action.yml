@@ -95,14 +95,16 @@ runs:
         set -ex
         if [ ! -f "${{ inputs.dockerfile }}" ]; then
           echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
-          exit 1
+          exit 2
         elif [ ! -d "${{ inputs.docker_context }}" ]; then
           echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
-          exit 1
+          exit 3
         fi
 
         suffix="${{ inputs.image_suffix }}"
         repo_name3="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
+        echo -n "$repo_name3"
+        echo -n "$repo_name3" | awk '{print tolower($0)}'
         repo_name="$( echo -n "$repo_name3" | awk '{print tolower($0)}' )"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
