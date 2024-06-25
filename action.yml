@@ -102,7 +102,9 @@ runs:
         fi
 
         suffix="${{ inputs.image_suffix }}"
-        repo_name3="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
+        sub="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}"
+        calc_suffix="$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
+        repo_name3="$sub$calc_suffix"
         echo -n "$repo_name3"
         echo -n "$repo_name3" | awk '{print tolower($0)}'
         repo_name="$( echo -n "$repo_name3" | awk '{print tolower($0)}' )"
