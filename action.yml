@@ -101,8 +101,10 @@ runs:
           exit 1
         fi
 
-        suffix="${{ inputs.image_suffix }}"
-        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
+        if [[ -n "${{ inputs.image_suffix }}" ]]; then
+          suffix="-${{ inputs.image_suffix }}"
+        fi
+        repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
         echo "done"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
