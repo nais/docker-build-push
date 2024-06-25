@@ -103,6 +103,7 @@ runs:
 
         suffix="${{ inputs.image_suffix }}"
         repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$( [[ -n "$suffix" ]] && echo -n "-$suffix" )"
+        echo "done"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
