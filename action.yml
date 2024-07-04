@@ -86,11 +86,6 @@ runs:
       shell: bash
       id: "setup"
       run: |
-        if [ ! -d "${{ inputs.docker_context }}" ]; then
-          echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
-          exit 1
-        fi
-
         dockerfile="${{ inputs.docker_context }}/Dockerfile"
         if [ ! -d "${{ inputs.dockerfile }}" ]; then
           dockerfile="${{ inputs.dockerfile }}"
