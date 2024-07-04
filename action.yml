@@ -3,15 +3,15 @@ description: "Build and push docker image to the NAIS registry"
 inputs:
   push_image:
     description: "Push image to registry"
-    required: true
+    required: false
     default: "true"
   dockerfile:
     description: "Dockerfile"
-    required: true
+    required: false
     default: "Dockerfile"
   docker_context:
     description: "Docker context"
-    required: true
+    required: false
     default: "."
   tag:
     description: "Custom docker tag"
