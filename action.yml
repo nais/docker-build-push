@@ -3,14 +3,14 @@ description: "Build and push docker image to the NAIS registry"
 inputs:
   push_image:
     description: "Push image to registry"
-    required: false
+    required: true
     default: "true"
   dockerfile:
     description: "Path to the Dockerfile. (default {docker_context}/Dockerfile)"
     required: false
   docker_context:
     description: "Docker build's context is the set of files located in the specified PATH or URL (default Git context)"
-    required: false
+    required: true
     default: "."
   tag:
     description: "Custom docker tag"
