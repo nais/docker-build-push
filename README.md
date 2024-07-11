@@ -25,7 +25,7 @@ jobs:
           tag: custom_tag # optional
           push_image: true # optional, default true
           pull: true # optional, default false
-          dockerfile: Dockerfile # optional, default Dockerfile
+          dockerfile: Dockerfile # optional, default docker_context/Dockerfile
           docker_context: . # optional, default .
           image_suffix: # optional, default empty
           cache_from: type=gha # optional, default type=gha

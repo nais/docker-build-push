@@ -6,11 +6,10 @@ inputs:
     required: true
     default: "true"
   dockerfile:
-    description: "Dockerfile"
-    required: true
-    default: "Dockerfile"
+    description: "Path to the Dockerfile. (default {docker_context}/Dockerfile)"
+    required: false
   docker_context:
-    description: "Docker context"
+    description: "Docker build's context is the set of files located in the specified PATH or URL (default Git context)"
     required: true
     default: "."
   tag:
@@ -87,13 +86,22 @@ runs:
       shell: bash
       id: "setup"
       run: |
-        if [ ! -f "${{ inputs.dockerfile }}" ]; then
-          echo "::error ::Dockerfile not found: ${{ inputs.dockerfile }}. Do you need to prepend context or working directory?"
-          exit 1
-        elif [ ! -d "${{ inputs.docker_context }}" ]; then
+        if [ ! -d "${{ inputs.docker_context }}" ]; then
           echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
           exit 1
         fi
+
+        dockerfile="${{ inputs.docker_context }}/Dockerfile"
+        if [ -n "${{ inputs.dockerfile }}" ]; then
+          dockerfile="${{ inputs.dockerfile }}"
+        fi
+
+        if [ ! -f "$dockerfile" ]; then
+        echo "::error ::Dockerfile not found: $dockerfile. Do you need to prepend context or working directory?"
+          exit 1
+        fi
+
+        echo "DOCKERFILE=$dockerfile" >> $GITHUB_OUTPUT
 
         suffix="${{ inputs.image_suffix }}"
         suffix=${suffix:+-$suffix} # Ensure we only add a dash if suffix is set
@@ -114,7 +122,7 @@ runs:
       id: build_push
       with:
         context: ${{ inputs.docker_context }}
-        file: ${{ inputs.dockerfile }}
+        file: ${{ steps.setup.outputs.DOCKERFILE }}
         push: ${{ inputs.push_image }}
         pull: ${{ inputs.pull }}
         tags: ${{ steps.meta.outputs.tags }}
