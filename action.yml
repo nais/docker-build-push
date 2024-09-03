@@ -59,6 +59,9 @@ inputs:
   platforms:
     description: "List of target platforms for build"
     required: false
+  outputs:
+    description: "List of output destinations (format: type=local,dest=path)"
+    required: false
 outputs:
   salsa:
     description: "SLSA attestation"
@@ -133,6 +136,7 @@ runs:
         secrets: ${{ inputs.build_secrets }}
         platforms: ${{ inputs.platforms }}
         target: ${{ inputs.target }}
+        outputs: ${{ inputs.outputs && fromJSON(inputs.outputs) || '' }}
     - name: Check for errors
       if: ${{ failure() && steps.build_push.outcome == 'failure' }}
       shell: bash
