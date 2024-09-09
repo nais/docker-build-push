@@ -22,6 +22,7 @@ jobs:
         id: docker-push
         with:
           team: myteam # required
+          tenant: nav # optional
           tag: custom_tag # optional
           push_image: true # optional, default true
           pull: true # optional, default false

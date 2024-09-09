@@ -21,6 +21,10 @@ inputs:
   identity_provider:
     description: "Workload Identity Provider"
     required: true
+  tenant:
+    description: "NAIS tenant, for use with telemetry"
+    required: false
+    default: "nav"
   team:
     description: "Team slug"
     required: true
