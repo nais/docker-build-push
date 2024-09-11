@@ -76,9 +76,17 @@ outputs:
   image:
     description: "Image name"
     value: ${{ steps.set-outputs.outputs.IMAGE }}
+  telemetry:
+    description: "OpenTelemetry tracing data"
+    value: ${{ steps.set-outputs.outputs.TELEMETRY }}
 runs:
   using: "composite"
   steps:
+    - name: Start Telemetry
+      id: telemetry
+      shell: bash
+      run: |
+        echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: NAIS login
       uses: nais/login@v0
       id: login
@@ -159,3 +167,4 @@ runs:
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
         echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
         echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
+        echo "TELEMETRY=${{ steps.telemetry.outputs.TELEMETRY_PIPELINE_START }}" >> $GITHUB_OUTPUT
