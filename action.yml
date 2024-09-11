@@ -182,4 +182,4 @@ runs:
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
         echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
         echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
-        echo "TELEMETRY=\"pipeline_start=${{ steps.telemetry_init.outputs.TELEMETRY_PIPELINE_START }},pipeline_end=${{ steps.telemetry_end.outputs.TELEMETRY_PIPELINE_END }},build_start=${{ steps.telemetry_build.outputs.TELEMETRY_BUILD_START }},attest_start=${{ steps.telemetry_attest.outputs.TELEMETRY_ATTEST_START }}\"" >> $GITHUB_OUTPUT
+        echo "TELEMETRY=\"pipeline_start=${{ steps.telemetry_init.outputs.TELEMETRY_PIPELINE_START }},build_start=${{ steps.telemetry_build.outputs.TELEMETRY_BUILD_START }},attest_start=${{ steps.telemetry_attest.outputs.TELEMETRY_ATTEST_START }},pipeline_end=${{ steps.telemetry_end.outputs.TELEMETRY_PIPELINE_END }}\"" >> $GITHUB_OUTPUT
