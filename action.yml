@@ -82,8 +82,8 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Start Telemetry
-      id: telemetry
+    - name: Initialize Telemetry
+      id: telemetry_init
       shell: bash
       run: |
         echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
@@ -129,6 +129,11 @@ runs:
         tags: |
           type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
+    - name: Telemetry record build start time
+      id: telemetry_build
+      shell: bash
+      run: |
+        echo "TELEMETRY_BUILD_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: Build and push
       uses: docker/build-push-action@16ebe778df0e7752d2cfcbd924afdbbd89c1a755 # ratchet:docker/build-push-action@v5
       id: build_push
@@ -151,6 +156,11 @@ runs:
       run: |
         echo "::error ::Failed during image build. Is your docker_context set to where your build files are?"
         exit 1
+    - name: Telemetry record attestation start time
+      id: telemetry_attest
+      shell: bash
+      run: |
+        echo "TELEMETRY_ATTEST_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
@@ -158,6 +168,11 @@ runs:
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
+    - name: Telemetry record end time
+      id: telemetry_end
+      shell: bash
+      run: |
+        echo "TELEMETRY_PIPELINE_END=$(date +'%s')" >> $GITHUB_OUTPUT
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
@@ -167,4 +182,4 @@ runs:
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
         echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
         echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
-        echo "TELEMETRY=${{ steps.telemetry.outputs.TELEMETRY_PIPELINE_START }}" >> $GITHUB_OUTPUT
+        echo "TELEMETRY=pipeline_start=${{ steps.telemetry.outputs.TELEMETRY_PIPELINE_START }},pipeline_end=${{ steps.telemetry.outputs.TELEMETRY_PIPELINE_END }},build_start=${{ steps.telemetry.outputs.TELEMETRY_BUILD_START }},attest_start=${{ steps.telemetry.outputs.TELEMETRY_ATTEST_START }}," >> $GITHUB_OUTPUT
