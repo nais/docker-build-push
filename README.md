@@ -48,7 +48,7 @@ jobs:
         env:
           # ...
           IMAGE: ${{ steps.docker-push.outputs.image }}
-		  TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
+          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
 ```
 
 ## Dependency
