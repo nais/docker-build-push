@@ -86,7 +86,7 @@ runs:
       id: telemetry_init
       shell: bash
       run: |
-        echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
+        echo "TELEMETRY_PIPELINE_START=$(git show --no-patch --format=%ct $GITHUB_SHA)" >> $GITHUB_OUTPUT
     - name: NAIS login
       uses: nais/login@v0
       id: login
