@@ -48,11 +48,20 @@ jobs:
         env:
           # ...
           IMAGE: ${{ steps.docker-push.outputs.image }}
+          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
 ```
 
 ## Dependency
 
 This action depends on [nais/login](https://github.com/nais/login) to authenticate with the registry and [nais/attest-sign](https://github.com/nais/attest-sign) to add some [SLSA](https://slsa.dev/).
+
+## SLSA
+
+This action [signs](https://doc.nais.io/security/salsa/salsa/?h=slsa#what-is-slsa) the image so that its integrity can be verified by anyone wanting to use it. A "Software Bill Of Materials" is also automatically generated unless you bring your own. This happens "keylessly" behind the scenes, and the signatures are uploaded to the public [transparency log](https://search.sigstore.dev/).
+
+## Telemetry
+
+Generates telemetry that is used by [nais/deploy](https://github.com/nais/deploy) to calculate the lead time for a deploy.
 
 ## Known issues
 
@@ -72,7 +81,3 @@ When using [Google Workload-identity-federation](https://cloud.google.com/iam/do
 `google.subject` is the principal IAM is authenticating and cannot exceed 127 bytes.
 The error typically happens if you have a long branch name, or a long repo name.
 Referring to this issue: https://github.com/google-github-actions/auth/blob/main/docs/TROUBLESHOOTING.md#subject-exceeds-the-127-byte-limit
-
-### SLSA
-
-This action [signs](https://doc.nais.io/security/salsa/salsa/?h=slsa#what-is-slsa) the image so that its integrity can be verified by anyone wanting to use it. A "Software Bill Of Materials" is also automatically generated unless you bring your own. This happens "keylessly" behind the scenes, and the signatures are uploaded to the public [transparency log](https://search.sigstore.dev/).

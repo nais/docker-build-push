@@ -86,6 +86,7 @@ runs:
       id: telemetry_init
       shell: bash
       run: |
+        echo "TELEMETRY_LATEST_COMMIT=$(git show --no-patch --format=%ct $GITHUB_SHA)" >> $GITHUB_OUTPUT
         echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: NAIS login
       uses: nais/login@v0
@@ -182,4 +183,4 @@ runs:
         echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
         echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
         echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
-        echo "TELEMETRY=pipeline_start=${{ steps.telemetry_init.outputs.TELEMETRY_PIPELINE_START }},build_start=${{ steps.telemetry_build.outputs.TELEMETRY_BUILD_START }},attest_start=${{ steps.telemetry_attest.outputs.TELEMETRY_ATTEST_START }},pipeline_end=${{ steps.telemetry_end.outputs.TELEMETRY_PIPELINE_END }}" >> $GITHUB_OUTPUT
+        echo "TELEMETRY=latest_commit=${{ steps.telemetry_init.outputs.TELEMETRY_LATEST_COMMIT }},pipeline_start=${{ steps.telemetry_init.outputs.TELEMETRY_PIPELINE_START }},build_start=${{ steps.telemetry_build.outputs.TELEMETRY_BUILD_START }},attest_start=${{ steps.telemetry_attest.outputs.TELEMETRY_ATTEST_START }},pipeline_end=${{ steps.telemetry_end.outputs.TELEMETRY_PIPELINE_END }}" >> $GITHUB_OUTPUT
