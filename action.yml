@@ -89,7 +89,7 @@ runs:
         echo "TELEMETRY_LATEST_COMMIT=$(git show --no-patch --format=%ct $GITHUB_SHA)" >> $GITHUB_OUTPUT
         echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: NAIS login
-      uses: nais/login@deploy-data-from-bucket
+      uses: nais/login@v0
       id: login
       with:
         project_id: ${{ inputs.project_id }}
