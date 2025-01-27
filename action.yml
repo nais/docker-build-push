@@ -17,10 +17,10 @@ inputs:
     required: false
   project_id:
     description: "Google Cloud project ID"
-    required: true
+    required: false
   identity_provider:
     description: "Workload Identity Provider"
-    required: true
+    required: false
   tenant:
     description: "NAIS tenant, for use with telemetry"
     required: false
