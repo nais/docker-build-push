@@ -17,10 +17,10 @@ inputs:
     required: false
   project_id:
     description: "Google Cloud project ID"
-    required: true
+    required: false
   identity_provider:
     description: "Workload Identity Provider"
-    required: true
+    required: false
   tenant:
     description: "NAIS tenant, for use with telemetry"
     required: false
@@ -89,11 +89,9 @@ runs:
         echo "TELEMETRY_LATEST_COMMIT=$(git show --no-patch --format=%ct $GITHUB_SHA)" >> $GITHUB_OUTPUT
         echo "TELEMETRY_PIPELINE_START=$(date +'%s')" >> $GITHUB_OUTPUT
     - name: NAIS login
-      uses: nais/login@v0
+      uses: nais/login@deploy-data-from-bucket
       id: login
       with:
-        project_id: ${{ inputs.project_id }}
-        identity_provider: ${{ inputs.identity_provider }}
         team: ${{ inputs.team }}
     - name: Setup environment
       shell: bash
