@@ -92,6 +92,8 @@ runs:
       uses: nais/login@deploy-data-from-bucket
       id: login
       with:
+        project_id: ${{ inputs.project_id }}
+        identity_provider: ${{ inputs.identity_provider }}
         team: ${{ inputs.team }}
     - name: Setup environment
       shell: bash
