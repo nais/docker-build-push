@@ -1,6 +1,6 @@
 # nais/docker-build-push
 
-This action contains recommended steps for building and publishing a Docker image used with the NAIS platform.
+This action contains recommended steps for building and publishing a Docker image used with the Nais platform. See the [docs](https://doc.nais.io/build/how-to/build-and-deploy/) for a full example
 
 It will authenticate with the registry and build the image, named after the repository, and use a generated tag containing the timestamp and short commit hash.
 
