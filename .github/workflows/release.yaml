@@ -1,0 +1,24 @@
+name: Git tag release
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '*.md'
+
+jobs:
+  build_and_push:
+    name: git tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - name: Force create tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git tag -f v0
+          git push -f --tags
