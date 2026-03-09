@@ -117,7 +117,7 @@ runs:
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # ratchet:docker/metadata-action@v5
+      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # ratchet:docker/metadata-action@v5
       with:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
