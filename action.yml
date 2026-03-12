@@ -83,7 +83,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      uses: nais/login@v0
+      uses: nais/login@v0 # ratchet:exclude
       id: login
       with:
         project_id: ${{ inputs.project_id }}
@@ -117,7 +117,7 @@ runs:
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # ratchet:docker/metadata-action@v5
+      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # ratchet:docker/metadata-action@v6
       with:
         images: |
           ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}
@@ -125,7 +125,7 @@ runs:
           type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
     - name: Build and push
-      uses: docker/build-push-action@1dc73863535b631f98b2378be8619f83b136f4a0 # ratchet:docker/build-push-action@v5
+      uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # ratchet:docker/build-push-action@v7
       id: build_push
       with:
         context: ${{ inputs.docker_context }}
@@ -150,7 +150,7 @@ runs:
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
-      uses: nais/attest-sign@v2
+      uses: nais/attest-sign@v2 # ratchet:exclude
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
