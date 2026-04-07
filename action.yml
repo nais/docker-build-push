@@ -83,7 +83,7 @@ runs:
   using: "composite"
   steps:
     - name: NAIS login
-      uses: nais/login@v0 # ratchet:exclude
+      uses: nais/login@c88ada9ce583928e1c84d2fd5c45cfacdd18d5de # ratchet:nais/login@v0
       id: login
       with:
         project_id: ${{ inputs.project_id }}
@@ -150,7 +150,7 @@ runs:
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
-      uses: nais/attest-sign@v2 # ratchet:exclude
+      uses: nais/attest-sign@9f718bc53c1379a59982d425d1e7456f632af881 # ratchet:nais/attest-sign@v2
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
