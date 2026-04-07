@@ -92,29 +92,33 @@ runs:
     - name: Setup environment
       shell: bash
       id: "setup"
+      env:
+        INPUT_DOCKER_CONTEXT: ${{ inputs.docker_context }}
+        INPUT_DOCKERFILE: ${{ inputs.dockerfile }}
+        INPUT_IMAGE_SUFFIX: ${{ inputs.image_suffix }}
       run: |
-        if [ ! -d "${{ inputs.docker_context }}" ]; then
-          echo "::error ::Docker context not found: ${{ inputs.docker_context }}."
+        if [ ! -d "$INPUT_DOCKER_CONTEXT" ]; then
+          echo "::error ::Docker context not found: $INPUT_DOCKER_CONTEXT."
           exit 1
         fi
 
-        dockerfile="${{ inputs.docker_context }}/Dockerfile"
-        if [ -n "${{ inputs.dockerfile }}" ]; then
-          dockerfile="${{ inputs.dockerfile }}"
+        dockerfile="$INPUT_DOCKER_CONTEXT/Dockerfile"
+        if [ -n "$INPUT_DOCKERFILE" ]; then
+          dockerfile="$INPUT_DOCKERFILE"
         fi
 
         if [ ! -f "$dockerfile" ]; then
-        echo "::error ::Dockerfile not found: $dockerfile. Do you need to prepend context or working directory?"
+          echo "::error ::Dockerfile not found: $dockerfile. Do you need to prepend context or working directory?"
           exit 1
         fi
 
-        echo "DOCKERFILE=$dockerfile" >> $GITHUB_OUTPUT
+        echo "DOCKERFILE=$dockerfile" >> "$GITHUB_OUTPUT"
 
-        suffix="${{ inputs.image_suffix }}"
+        suffix="$INPUT_IMAGE_SUFFIX"
         suffix=${suffix:+-$suffix} # Ensure we only add a dash if suffix is set
         repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
-        echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
+        echo "REPO_NAME=$repo_name" >> "$GITHUB_OUTPUT"
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # ratchet:docker/metadata-action@v6
@@ -158,8 +162,15 @@ runs:
     - name: Set outputs
       shell: bash
       id: set-outputs
+      env:
+        META_VERSION: ${{ steps.meta.outputs.version }}
+        META_TAGS: ${{ steps.meta.outputs.tags }}
+        BUILD_DIGEST: ${{ steps.build_push.outputs.digest }}
+        ATTEST_SBOM: ${{ steps.attest-sign.outputs.sbom }}
       run: |
-        echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
-        echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
-        echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
-        echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
+        IMAGE_FIRST_TAG="$(echo "$META_TAGS" | head -n 1)"
+
+        echo "NEW_VERSION=$META_VERSION" >> "$GITHUB_OUTPUT"
+        echo "IMAGE=$IMAGE_FIRST_TAG" >> "$GITHUB_OUTPUT"
+        echo "DIGEST=$BUILD_DIGEST" >> "$GITHUB_OUTPUT"
+        echo "SALSA=$ATTEST_SBOM" >> "$GITHUB_OUTPUT"

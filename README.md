@@ -22,10 +22,10 @@ jobs:
         id: docker-push
         with:
           team: myteam # required
-          tenant: nav # optional
+          tenant: nav # optional, default nav
           tag: custom_tag # optional
           push_image: true # optional, default true
-          pull: true # optional, default false
+          pull: true # optional, default true
           dockerfile: Dockerfile # optional, default docker_context/Dockerfile
           docker_context: . # optional, default .
           image_suffix: # optional, default empty
@@ -37,16 +37,26 @@ jobs:
           build_secrets:
             | # optional, default empty. See https://docs.docker.com/build/ci/github-actions/secrets/
             key=string
+          outputs: type=local,dest=path # optional, default empty. List of output destinations
           target: runtime # optional, default empty
-          salsa: true # optional, default true, generates a attestation for the image
-          byosbom: # defaults to use Trivy for SBOM generation, if salsa is true, but can be overwritten sending in a path to a  pre-generated SBOM
-          platforms: # optional, pass trough to docker/build-push-action. See https://github.com/docker/build-push-action#usage. Requires setup-qemu-action, https://github.com/docker/setup-qemu-action#usage
+          salsa: true # optional, default true, generates an attestation for the image
+          byosbom: # optional, defaults to use Trivy for SBOM generation if salsa is true, can be overwritten with a path to a pre-generated SBOM
+          platforms: # optional, pass through to docker/build-push-action. See https://github.com/docker/build-push-action#usage. Requires setup-qemu-action, https://github.com/docker/setup-qemu-action#usage
       - name: Deploy
         uses: nais/deploy/actions/deploy@v2
         env:
           # ...
           IMAGE: ${{ steps.docker-push.outputs.image }}
 ```
+
+## Outputs
+
+| Output   | Description                      |
+|----------|----------------------------------|
+| `image`  | Full image name with tag         |
+| `tag`    | Release tag (version)            |
+| `digest` | Image digest                     |
+| `salsa`  | SLSA attestation (SBOM path)     |
 
 ## Dependency
 
