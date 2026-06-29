@@ -40,6 +40,9 @@ jobs:
           target: runtime # optional, default empty
           salsa: true # optional, default true, generates a attestation for the image
           byosbom: # defaults to use Trivy for SBOM generation, if salsa is true, but can be overwritten sending in a path to a  pre-generated SBOM
+          additional_sboms: | # optional, newline-separated list of extra CycloneDX SBOM files to merge with the primary SBOM
+            npm-sbom.json
+            frontend-sbom.json
           platforms: # optional, pass trough to docker/build-push-action. See https://github.com/docker/build-push-action#usage. Requires setup-qemu-action, https://github.com/docker/setup-qemu-action#usage
       - name: Deploy
         uses: nais/deploy/actions/deploy@v2
@@ -55,6 +58,8 @@ This action depends on [nais/login](https://github.com/nais/login) to authentica
 ## SLSA
 
 This action [signs](https://doc.nais.io/security/salsa/salsa/?h=slsa#what-is-slsa) the image so that its integrity can be verified by anyone wanting to use it. A "Software Bill Of Materials" is also automatically generated unless you bring your own. This happens "keylessly" behind the scenes, and the signatures are uploaded to the public [transparency log](https://search.sigstore.dev/).
+
+If you need to combine image dependencies with application dependencies, use `byosbom` for the primary CycloneDX SBOM and `additional_sboms` for any extra CycloneDX SBOM files. These are merged by `nais/attest-sign` before attestation.
 
 ## Known issues
 

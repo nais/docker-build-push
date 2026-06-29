@@ -63,6 +63,10 @@ inputs:
     description: "Bring your own, use existing SBOM for SLSA"
     required: false
     default: "auto-generate-for-me-please.json"
+  additional_sboms:
+    description: "Newline-separated list of extra CycloneDX SBOM files to merge with the primary SBOM"
+    required: false
+    default: ""
   platforms:
     description: "List of target platforms for build"
     required: false
@@ -154,6 +158,7 @@ runs:
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
+        additional_sboms: ${{ inputs.additional_sboms }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
