@@ -63,6 +63,10 @@ inputs:
     description: "Bring your own, use existing SBOM for SLSA"
     required: false
     default: "auto-generate-for-me-please.json"
+  additional_sboms:
+    description: "Newline-separated list of extra CycloneDX SBOM files to merge with the primary SBOM"
+    required: false
+    default: ""
   platforms:
     description: "List of target platforms for build"
     required: false
@@ -150,10 +154,11 @@ runs:
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
-      uses: nais/attest-sign@2548fccb3e472f3f65d1cf0fe6e339c7675d3c55 # ratchet:nais/attest-sign@v2
+      uses: nais/attest-sign@bb00e4baa4e7acd00b6aff2502b2dfed3d4fad40 # ratchet:nais/attest-sign@v2
       with:
         image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
         sbom: ${{ inputs.byosbom }}
+        additional_sboms: ${{ inputs.additional_sboms }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
