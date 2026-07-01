@@ -199,13 +199,15 @@ runs:
     - name: Set outputs
       shell: bash
       id: set-outputs
+      env:
+        IMAGE: ${{ steps.image-ref.outputs.image }}
+        DIGEST: ${{ steps.build_push.outputs.digest }}
+        NEW_VERSION: ${{ steps.meta.outputs.version }}
+        SALSA_OUTPUT: ${{ steps.attest-sign.outputs.sbom }}
       run: |
         set -euo pipefail
 
-        image="${{ steps.image-ref.outputs.image }}"
-        digest="${{ steps.build_push.outputs.digest }}"
-
-        echo "new_version=${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
-        echo "image=$image" >> "$GITHUB_OUTPUT"
-        echo "digest=$digest" >> "$GITHUB_OUTPUT"
-        echo "salsa=${{ steps.attest-sign.outputs.sbom }}" >> "$GITHUB_OUTPUT"
+        echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+        echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+        echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+        echo "salsa=$SALSA_OUTPUT" >> "$GITHUB_OUTPUT"
