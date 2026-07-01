@@ -14,7 +14,7 @@ After:
 
 `europe-north1-docker.pkg.dev/nais-io/nais/images/app:2026.07.01-12.34-abcdef0@sha256:abc123...`
 
-If no digest is available, the `image` output falls back to the tagged image reference only. This can happen for example when `push_image` is `false`, or when the underlying build step does not produce a digest. Consumers that require an immutable image reference should ensure a digest is present before using the output for deployment or attestation.
+If no pushed-image digest is available, the `image` output falls back to the tagged image reference only. This happens when `push_image` is `false`, or when the underlying build step does not produce a digest for a pushed image. Consumers that require an immutable registry reference should ensure `push_image` is `true` and that a digest is present before using the output for deployment or attestation.
 
 If you need to build multiple images from the same repository, you can use the `image_suffix` input to add a suffix to the image name.
 

@@ -182,7 +182,7 @@ runs:
 
         image_ref="$image"
 
-        if [ -n "$digest" ]; then
+        if [ "$PUSH_IMAGE" = 'true' ] && [ -n "$digest" ]; then
           image_ref="$image@$digest"
         fi
 
