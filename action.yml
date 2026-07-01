@@ -171,7 +171,7 @@ runs:
         fi
 
         if [[ "$image" == *"@"* ]] && [ -n "$digest" ]; then
-          echo "::error ::Failed to construct canonical image reference. Expected image tag without digest, but image already contained '@' while a separate digest was also provided."
+          echo "::error ::Image tag must not include a digest when digest is provided separately."
           exit 1
         fi
 
