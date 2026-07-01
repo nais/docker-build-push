@@ -73,16 +73,16 @@ inputs:
 outputs:
   salsa:
     description: "SLSA attestation"
-    value: ${{ steps.set-outputs.outputs.SALSA }}
+    value: ${{ steps.set-outputs.outputs.salsa }}
   digest:
     description: "Image digest"
-    value: ${{ steps.set-outputs.outputs.DIGEST }}
+    value: ${{ steps.set-outputs.outputs.digest }}
   tag:
     description: "Release tag"
-    value: ${{ steps.set-outputs.outputs.NEW_VERSION }}
+    value: ${{ steps.set-outputs.outputs.new_version }}
   image:
-    description: "Image name"
-    value: ${{ steps.set-outputs.outputs.IMAGE }}
+    description: "Canonical image reference"
+    value: ${{ steps.set-outputs.outputs.image }}
 runs:
   using: "composite"
   steps:
@@ -151,20 +151,63 @@ runs:
       run: |
         echo "::error ::Failed during image build. Is your docker_context set to where your build files are?"
         exit 1
+    - name: Build canonical image ref
+      shell: bash
+      id: image-ref
+      env:
+        IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+        IMAGE_DIGEST: ${{ steps.build_push.outputs.digest }}
+        PUSH_IMAGE: ${{ inputs.push_image }}
+        SALSA: ${{ inputs.salsa }}
+      run: |
+        set -euo pipefail
+
+        image="${IMAGE_TAGS%%$'\n'*}"
+        digest="${IMAGE_DIGEST#@}"
+
+        if [ -z "$image" ]; then
+          echo "::error ::Failed to resolve image tag from docker metadata output. Expected steps.meta.outputs.tags to contain at least one image tag."
+          exit 1
+        fi
+
+        if [[ "$image" == *"@"* ]] && [ -n "$digest" ]; then
+          echo "::error ::Image tag must not include a digest when digest is provided separately."
+          exit 1
+        fi
+
+        if [ "$PUSH_IMAGE" = 'true' ] && [ "$SALSA" = 'true' ] && [ -z "$digest" ]; then
+          echo "::error ::Failed to resolve image digest from docker build output. Digest is required when push_image=true and salsa=true."
+          exit 1
+        fi
+
+        image_ref="$image"
+
+        if [ "$PUSH_IMAGE" = 'true' ] && [ -n "$digest" ]; then
+          image_ref="$image@$digest"
+        fi
+
+        echo "image=$image_ref" >> "$GITHUB_OUTPUT"
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
       uses: nais/attest-sign@bb00e4baa4e7acd00b6aff2502b2dfed3d4fad40 # ratchet:nais/attest-sign@v2
       with:
-        image_ref: ${{ steps.login.outputs.registry }}/${{ steps.setup.outputs.REPO_NAME }}@${{ steps.build_push.outputs.digest }}
+        image_ref: ${{ steps.image-ref.outputs.image }}
         sbom: ${{ inputs.byosbom }}
         additional_sboms: ${{ inputs.additional_sboms }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
       id: set-outputs
+      env:
+        IMAGE: ${{ steps.image-ref.outputs.image }}
+        DIGEST: ${{ steps.build_push.outputs.digest }}
+        NEW_VERSION: ${{ steps.meta.outputs.version }}
+        SALSA_OUTPUT: ${{ steps.attest-sign.outputs.sbom }}
       run: |
-        echo "NEW_VERSION=${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
-        echo "IMAGE=${{ fromJSON(steps.meta.outputs.json).tags[0] }}" >> $GITHUB_OUTPUT
-        echo "DIGEST=${{ steps.build_push.outputs.digest }}" >> $GITHUB_OUTPUT
-        echo "SALSA=${{ steps.attest-sign.outputs.sbom }}" >> $GITHUB_OUTPUT
+        set -euo pipefail
+
+        echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+        echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+        echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+        echo "salsa=$SALSA_OUTPUT" >> "$GITHUB_OUTPUT"

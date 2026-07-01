@@ -4,6 +4,18 @@ This action contains recommended steps for building and publishing a Docker imag
 
 It will authenticate with the registry and build the image, named after the repository, and use a generated tag containing the timestamp and short commit hash.
 
+The `image` output is the canonical image reference. When a digest is available, it is returned as `<registry>/<repo>:<tag>@<digest>` so deployments and attestation can use an immutable image reference while still preserving the readable tag.
+
+Before:
+
+`europe-north1-docker.pkg.dev/nais-io/nais/images/app:2026.07.01-12.34-abcdef0`
+
+After:
+
+`europe-north1-docker.pkg.dev/nais-io/nais/images/app:2026.07.01-12.34-abcdef0@sha256:abc123...`
+
+If no pushed-image digest is available, the `image` output falls back to the tagged image reference only. This happens when `push_image` is `false`, or when the underlying build step does not produce a digest for a pushed image. Consumers that require an immutable registry reference should ensure `push_image` is `true` and that a digest is present before using the output for deployment or attestation.
+
 If you need to build multiple images from the same repository, you can use the `image_suffix` input to add a suffix to the image name.
 
 ## Usage
