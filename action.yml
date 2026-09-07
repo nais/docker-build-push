@@ -40,6 +40,10 @@ inputs:
     description: "Disable Docker buildx cache. When true, cache_from and cache_to are ignored so no cache is read or exported."
     required: false
     default: "false"
+  buildkit_version:
+    description: "BuildKit version (moby/buildkit image tag) to run in the buildx builder"
+    required: false
+    default: "v0.32.2"
   image_suffix:
     description: "Adds a suffiks to the generated docker image name"
     required: false
@@ -132,6 +136,10 @@ runs:
         tags: |
           type=sha,prefix={{date 'YYYY.MM.DD-HH.mm'}}-,priority=9002
           type=raw,enable=${{ inputs.tag != '' }},value=${{ inputs.tag }},priority=9001
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # ratchet:docker/setup-buildx-action@v4
+      with:
+        driver-opts: image=moby/buildkit:${{ inputs.buildkit_version }}
     - name: Build and push
       uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # ratchet:docker/build-push-action@v7
       id: build_push
