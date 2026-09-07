@@ -41,9 +41,10 @@ jobs:
           dockerfile: Dockerfile # optional, default docker_context/Dockerfile
           docker_context: . # optional, default .
           image_suffix: # optional, default empty
-          cache_from: type=gha # optional, default type=gha
-          cache_to: type=gha,mode=max # optional, default type=gha,mode=max
-          no_cache: false # optional, default false. When true, ignores cache_from/cache_to
+          cache_from: # optional, default empty. Overrides cache_backend read side
+          cache_to: # optional, default empty. Overrides cache_backend write side
+          cache_backend: gha # optional, default gha. 'gha' or 'registry' (<image>/cache)
+          no_cache: false # optional, default false. When true, ignores cache_from/cache_to/cache_backend
           buildkit_version: v0.32.2 # optional, default v0.32.2, BuildKit version to run in the buildx builder
           build_args: | # optional, default empty
             FOO=bar
@@ -64,6 +65,25 @@ jobs:
           # ...
           IMAGE: ${{ steps.docker-push.outputs.image }}
 ```
+
+## Build cache
+
+By default (`cache_backend: gha`) the buildx layer cache is stored in the GitHub
+Actions cache (`type=gha` / `type=gha,mode=max`), unchanged from before.
+
+Set `cache_backend: registry` to instead store the cache in a registry image next
+to the built image (`<image>/cache`), using the credentials from `nais/login`. This
+is useful when the `type=gha` cache is unreliable for a repo. It has had recurring
+`BlobNotFound` failures. Notes:
+
+- The cache image is overwritten every build, but its blobs accumulate until they
+  are garbage-collected. Configure a cleanup policy on the registry repository.
+- `mode=max` is used, so every build stage is cached.
+- `image-manifest=true,oci-mediatypes=true` is set, which Artifact Registry and
+  ECR require.
+
+`cache_from` / `cache_to` set the buildx cache args directly and take precedence
+over `cache_backend` for that side. `no_cache: true` disables the cache entirely.
 
 ## Dependency
 
