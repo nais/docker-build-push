@@ -43,6 +43,7 @@ jobs:
           image_suffix: # optional, default empty
           cache_from: type=gha # optional, default type=gha
           cache_to: type=gha,mode=max # optional, default type=gha,mode=max
+          no_cache: false # optional, default false. When true, ignores cache_from/cache_to
           build_args: | # optional, default empty
             FOO=bar
             BAZ=qux
