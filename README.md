@@ -44,7 +44,7 @@ jobs:
           cache_from: type=gha # optional, default type=gha
           cache_to: type=gha,mode=max # optional, default type=gha,mode=max
           no_cache: false # optional, default false. When true, ignores cache_from/cache_to
-          buildkit_version: v0.32.2 # optional, default v0.32.2, BuildKit version run in the buildx builder
+          buildkit_version: v0.32.2 # optional, default v0.32.2, BuildKit version to run in the buildx builder
           build_args: | # optional, default empty
             FOO=bar
             BAZ=qux
