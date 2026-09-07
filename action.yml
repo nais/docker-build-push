@@ -142,9 +142,7 @@ runs:
         pull: ${{ inputs.pull }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # no_cache disables the cache entirely: pass empty cache-from/cache-to so nothing is
-        # read or exported. Written as `!= 'true' && x || ''` because GitHub Actions treats an
-        # empty string as falsy, so the more obvious `== 'true' && '' || x` would fall through to x.
+        # no_cache=true blanks cache-from/cache-to so nothing is read or exported
         cache-from: ${{ inputs.no_cache != 'true' && inputs.cache_from || '' }}
         cache-to: ${{ inputs.no_cache != 'true' && inputs.cache_to || '' }}
         no-cache: ${{ inputs.no_cache }}
