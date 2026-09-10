@@ -40,6 +40,16 @@ jobs:
             --cache-to type=registry,ref=localhost:5000/cache,mode=max,image-manifest=true,oci-mediatypes=true \
             --output type=cacheonly
 
+      - name: Verify the registry cache manifest
+        run: |
+          curl --fail --silent --show-error \
+            --header 'Accept: application/vnd.oci.image.manifest.v1+json' \
+            http://localhost:5000/v2/cache/manifests/latest > cache-manifest.json
+          grep -q '"schemaVersion":2' cache-manifest.json || {
+            echo "::error ::registry cache export did not produce an OCI image manifest"
+            exit 1
+          }
+
       # A fresh builder has no local cache, so a CACHED step here can only come
       # from importing the cache that the previous step exported to the registry.
       - name: Rebuild on a fresh builder and assert the cache imports
@@ -52,7 +62,7 @@ jobs:
             --cache-from type=registry,ref=localhost:5000/cache \
             --output type=cacheonly \
             --progress plain 2>&1 | tee import.log
-          grep -q 'CACHED' import.log || {
-            echo "::error ::registry cache import produced no cache hits"
+          grep -A1 'RUN echo smoke > /marker' import.log | grep -q 'CACHED' || {
+            echo "::error ::registry cache import did not cache the RUN layer"
             exit 1
           }
