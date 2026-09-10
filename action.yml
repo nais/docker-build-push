@@ -29,15 +29,19 @@ inputs:
     description: "Team slug"
     required: true
   cache_from:
-    description: "Docker buildx cache from"
+    description: "Docker buildx cache-from. When set, overrides cache_backend for the read side."
     required: false
-    default: "type=gha"
+    default: ""
   cache_to:
-    description: "Docker buildx cache to"
+    description: "Docker buildx cache-to. When set, overrides cache_backend for the write side."
     required: false
-    default: "type=gha,mode=max"
+    default: ""
+  cache_backend:
+    description: "Where to store the buildx layer cache: 'gha' (GitHub Actions cache) or 'registry' (an image next to the built image, <image>/cache). A side set explicitly via cache_from/cache_to takes precedence."
+    required: false
+    default: "gha"
   no_cache:
-    description: "Disable Docker buildx cache. When true, cache_from and cache_to are ignored so no cache is read or exported."
+    description: "Disable Docker buildx cache. When true, cache_from, cache_to and cache_backend are ignored so no cache is read or exported."
     required: false
     default: "false"
   buildkit_version:
@@ -127,6 +131,40 @@ runs:
         repo_name="${GITHUB_REPOSITORY/$GITHUB_REPOSITORY_OWNER\//}$suffix"
         repo_name="$(tr '[:upper:]' '[:lower:]' <<< "$repo_name")"
         echo "REPO_NAME=$repo_name" >> $GITHUB_OUTPUT
+    - name: Resolve build cache
+      shell: bash
+      id: cache
+      env:
+        REGISTRY: ${{ steps.login.outputs.registry }}
+        REPO_NAME: ${{ steps.setup.outputs.REPO_NAME }}
+        CACHE_FROM_INPUT: ${{ inputs.cache_from }}
+        CACHE_TO_INPUT: ${{ inputs.cache_to }}
+        CACHE_BACKEND: ${{ inputs.cache_backend }}
+        NO_CACHE: ${{ inputs.no_cache }}
+      run: |
+        cache_from="$CACHE_FROM_INPUT"
+        cache_to="$CACHE_TO_INPUT"
+        if [ "$NO_CACHE" = "true" ]; then
+          cache_from=""
+          cache_to=""
+        elif [ "$CACHE_BACKEND" = "registry" ]; then
+          # Opt-in alternative to type=gha, which has had recurring blob-consistency
+          # failures. image-manifest + oci-mediatypes are required by Artifact
+          # Registry / ECR. An explicit cache_from/cache_to still wins per side.
+          ref="$REGISTRY/$REPO_NAME/cache"
+          cache_from="${cache_from:-type=registry,ref=$ref}"
+          cache_to="${cache_to:-type=registry,ref=$ref,mode=max,image-manifest=true,oci-mediatypes=true}"
+        elif [ "$CACHE_BACKEND" = "gha" ]; then
+          cache_from="${cache_from:-type=gha}"
+          cache_to="${cache_to:-type=gha,mode=max}"
+        else
+          echo "::error ::Unknown cache_backend '$CACHE_BACKEND'. Use 'gha' or 'registry'."
+          exit 1
+        fi
+        {
+          echo "cache_from<<EOF"; echo "$cache_from"; echo "EOF"
+          echo "cache_to<<EOF"; echo "$cache_to"; echo "EOF"
+        } >> "$GITHUB_OUTPUT"
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # ratchet:docker/metadata-action@v6
@@ -151,9 +189,8 @@ runs:
         pull: ${{ inputs.pull }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # no_cache=true blanks cache-from/cache-to so nothing is read or exported
-        cache-from: ${{ inputs.no_cache != 'true' && inputs.cache_from || '' }}
-        cache-to: ${{ inputs.no_cache != 'true' && inputs.cache_to || '' }}
+        cache-from: ${{ steps.cache.outputs.cache_from }}
+        cache-to: ${{ steps.cache.outputs.cache_to }}
         no-cache: ${{ inputs.no_cache }}
         build-args: ${{ inputs.build_args }}
         secrets: ${{ inputs.build_secrets }}
