@@ -196,7 +196,7 @@ runs:
     - name: Generate SBOM, attest and sign image
       if: ${{ inputs.push_image == 'true' && inputs.salsa == 'true' }}
       id: attest-sign
-      uses: nais/attest-sign@fb682a4e2e92380274d6fd5332324831b62c1961 # ratchet:nais/attest-sign@v2
+      uses: nais/attest-sign@c02a0aedb111660e9fcf79e505753d6a7af4dcd5 # ratchet:nais/attest-sign@v2
       with:
         image_ref: ${{ steps.image-ref.outputs.image }}
         sbom: ${{ inputs.byosbom }}
