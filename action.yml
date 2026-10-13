@@ -71,6 +71,10 @@ inputs:
     description: "Newline-separated list of extra CycloneDX SBOM files to merge with the primary SBOM"
     required: false
     default: ""
+  sbom_check:
+    description: "SBOM normalization and linting mode: warn (default), error, or off"
+    required: false
+    default: "warn"
   platforms:
     description: "List of target platforms for build"
     required: false
@@ -201,6 +205,7 @@ runs:
         image_ref: ${{ steps.image-ref.outputs.image }}
         sbom: ${{ inputs.byosbom }}
         additional_sboms: ${{ inputs.additional_sboms }}
+        sbom_check: ${{ inputs.sbom_check }}
     # For some reason, nested composite outputs aren't properly evaluated, so we need to set them again.
     - name: Set outputs
       shell: bash
