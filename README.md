@@ -56,6 +56,7 @@ jobs:
           additional_sboms: | # optional, newline-separated list of extra CycloneDX SBOM files to merge with the primary SBOM
             npm-sbom.json
             frontend-sbom.json
+          sbom_check: warn # optional, default warn; use error to fail on schema errors or broken dependency graphs, or off to skip normalization and checking
           platforms: # optional, pass trough to docker/build-push-action. See https://github.com/docker/build-push-action#usage. Requires setup-qemu-action, https://github.com/docker/setup-qemu-action#usage
       - name: Deploy
         uses: nais/deploy/actions/deploy@v2
@@ -73,6 +74,8 @@ This action depends on [nais/login](https://github.com/nais/login) to authentica
 This action [signs](https://doc.nais.io/security/salsa/salsa/?h=slsa#what-is-slsa) the image so that its integrity can be verified by anyone wanting to use it. A "Software Bill Of Materials" is also automatically generated unless you bring your own. This happens "keylessly" behind the scenes, and the signatures are uploaded to the public [transparency log](https://search.sigstore.dev/).
 
 If you need to combine image dependencies with application dependencies, use `byosbom` for the primary CycloneDX SBOM and `additional_sboms` for any extra CycloneDX SBOM files. These are merged by `nais/attest-sign` before attestation.
+
+Set `sbom_check` to `warn` (default) to normalize the SBOM and report schema and lint findings without failing the build. Use `error` to fail on schema errors or broken dependency graphs; advisory findings do not fail the build. Use `off` to skip normalization and checking; merging additional SBOMs still runs. This setting applies when `push_image` and `salsa` are both `true`.
 
 ## Known issues
 
