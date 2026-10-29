@@ -7,7 +7,7 @@
       "component": "docker-build-push",
       "include-component-in-tag": false,
       "include-v-in-tag": true,
-      "bump-minor-pre-major": true
+      "initial-version": "1.0.0"
     }
   }
 }
