@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: nais/docker-build-push@v0
+      - uses: nais/docker-build-push@v1
         id: docker-push
         with:
           team: myteam # required
@@ -64,6 +64,16 @@ jobs:
           # ...
           IMAGE: ${{ steps.docker-push.outputs.image }}
 ```
+
+## Releases
+
+Starting with `v1.0.0`, releases are managed by release-please. The floating `v1` tag follows published `1.x` releases, not every push to `main`. Breaking changes require a new major version.
+
+The `v0` tag stays at its last commit before this transition and receives no further updates, including security fixes. Change `nais/docker-build-push@v0` to `nais/docker-build-push@v1` after `v1.0.0` is published.
+
+The empty release manifest and `initial-version: 1.0.0` bootstrap the first release at `1.0.0`. Release-please then records published versions in the manifest and calculates subsequent versions from conventional commits.
+
+Squash-merge the release-please setup PR with a releasable title, such as `feat: adopt release-please for v1 releases`. A `chore:`-only change does not trigger a release PR. Merge the generated release PR to publish `v1.0.0` and create the floating `v1` tag.
 
 ## Dependency
 
