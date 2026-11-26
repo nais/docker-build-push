@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/nais/docker-build-push/compare/v1.0.0...v1.0.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** bump nais/attest-sign to 2.1.9 ([5578b43](https://github.com/nais/docker-build-push/commit/5578b43d3e94f93f827feeb38f46bad9e00f66be))
+* **deps:** bump nais/attest-sign to 2.1.9 ([614e9e7](https://github.com/nais/docker-build-push/commit/614e9e76c95f533fd628445ca26d6b4505e969b7))
+
 ## 1.0.0 (2026-11-17)
 
 
